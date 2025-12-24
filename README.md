@@ -1,1 +1,1 @@
-# page-protection
+page-access-protection
