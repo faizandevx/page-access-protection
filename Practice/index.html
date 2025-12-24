@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo Fetcher</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #todo { background: #f4f4f4; padding: 10px; border-radius: 5px; width: 350px; margin-top: 10px; }
+    input, button { padding: 5px 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Todo Fetcher</h1>
+
+  <label for="todoId">Enter Todo ID:</label>
+  <input type="number" id="todoId" placeholder="Enter ID" min="1">
+  <button id="fetchByIdBtn">Fetch Todo</button>
+  <button id="nextTodoBtn">Next Todo</button>
+
+  <div id="todo">Loading...</div>
+
+  <script>
+    const todoDiv = document.getElementById('todo');
+    const input = document.getElementById('todoId');
+    const fetchByIdBtn = document.getElementById('fetchByIdBtn');
+    const nextTodoBtn = document.getElementById('nextTodoBtn');
+
+    let currentId = 1; // Start ID
+
+    // Function to fetch and display todo
+    function fetchTodo(id) {
+      todoDiv.innerText = 'Loading...';
+
+      fetch(`https://jsonplaceholder.typicode.com/todos/${id}`)
+        .then(response => response.json())
+        .then(todo => {
+          // Check if data exists
+          if (!todo.id) {
+            todoDiv.innerText = `Todo not found for ID ${id}`;
+          } else {
+            todoDiv.innerHTML = `
+              <p><strong>User ID:</strong> ${todo.userId}</p>
+              <p><strong>ID:</strong> ${todo.id}</p>
+              <p><strong>Title:</strong> ${todo.title}</p>
+              <p><strong>Completed:</strong> ${todo.completed}</p>
+            `;
+            currentId = todo.id; // Update currentId for next button
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          todoDiv.innerText = 'Failed to load data!';
+        });
+    }
+
+    // Initial fetch
+    fetchTodo(currentId);
+
+    // Fetch by user input
+    fetchByIdBtn.addEventListener('click', () => {
+      const id = parseInt(input.value);
+      if (isNaN(id) || id < 1) {
+        alert('Please enter a valid positive number.');
+        return;
+      }
+      fetchTodo(id);
+    });
+
+    // Fetch next todo
+    nextTodoBtn.addEventListener('click', () => {
+      currentId++;
+      fetchTodo(currentId);
+    });
+  </script>
+</body>
+</html>
